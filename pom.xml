@@ -27,6 +27,13 @@
         <cucumber.version>7.0.0</cucumber.version>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:orangebeard-io/cucumber-java-listener.git</connection>
+        <url>https://github.com/orangebeard-io/cucumber-java-listener.git</url>
+        <developerConnection>scm:git:git@github.com:orangebeard-io/cucumber-java-listener.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>io.orangebeard</groupId>
@@ -171,7 +178,7 @@
                 <repository>
                     <id>github</id>
                     <name>GitHub OWNER Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/orangebeard-io/junit5-listener</url>
+                    <url>https://maven.pkg.github.com/orangebeard-io/cucumber-java-listener</url>
                 </repository>
             </distributionManagement>
         </profile>
