@@ -1,8 +1,19 @@
 package io.orangebeard.listener;
 
+import io.cucumber.plugin.EventListener;
+import io.cucumber.plugin.event.DataTableArgument;
+import io.cucumber.plugin.event.EventPublisher;
+import io.cucumber.plugin.event.PickleStepTestStep;
+import io.cucumber.plugin.event.Result;
+import io.cucumber.plugin.event.TestCaseFinished;
+import io.cucumber.plugin.event.TestCaseStarted;
+import io.cucumber.plugin.event.TestRunFinished;
+import io.cucumber.plugin.event.TestRunStarted;
+import io.cucumber.plugin.event.TestStepFinished;
+import io.cucumber.plugin.event.TestStepStarted;
 import io.orangebeard.client.OrangebeardClient;
 import io.orangebeard.client.OrangebeardProperties;
-import io.orangebeard.client.OrangebeardV1Client;
+import io.orangebeard.client.OrangebeardV2Client;
 import io.orangebeard.client.entity.FinishTestItem;
 import io.orangebeard.client.entity.FinishTestRun;
 import io.orangebeard.client.entity.Log;
@@ -18,17 +29,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import io.cucumber.plugin.EventListener;
-import io.cucumber.plugin.event.DataTableArgument;
-import io.cucumber.plugin.event.EventPublisher;
-import io.cucumber.plugin.event.PickleStepTestStep;
-import io.cucumber.plugin.event.Result;
-import io.cucumber.plugin.event.TestCaseFinished;
-import io.cucumber.plugin.event.TestCaseStarted;
-import io.cucumber.plugin.event.TestRunFinished;
-import io.cucumber.plugin.event.TestRunStarted;
-import io.cucumber.plugin.event.TestStepFinished;
-import io.cucumber.plugin.event.TestStepStarted;
 
 public class OrangebeardCucumberListener implements EventListener {
     private final OrangebeardClient orangebeardClient;
@@ -41,7 +41,7 @@ public class OrangebeardCucumberListener implements EventListener {
 
     public OrangebeardCucumberListener() {
         this.properties = new OrangebeardProperties();
-        this.orangebeardClient = new OrangebeardV1Client(
+        this.orangebeardClient = new OrangebeardV2Client(
                 properties.getEndpoint(),
                 properties.getAccessToken(),
                 properties.getProjectName(),
