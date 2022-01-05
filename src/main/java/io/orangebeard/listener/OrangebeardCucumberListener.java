@@ -71,7 +71,7 @@ public class OrangebeardCucumberListener implements EventListener {
     private void startTestCase(TestCaseStarted event) {
         UUID suiteId = startSuiteIfRequired(event.getTestCase().getUri());
         String name = getName(event.getTestCase().getKeyword(), event.getTestCase().getName());
-        UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.TEST));
+        UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.STEP));
         testItemMap.put(event.getTestCase().getName(), testItemUUID);
     }
 
@@ -86,7 +86,7 @@ public class OrangebeardCucumberListener implements EventListener {
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
             String stepName = getName(testStep.getStep().getKeyword(), testStep.getStep().getText());
 
-            UUID stepUUID = orangebeardClient.startTestItem(testCaseId, new StartTestItem(testRunUUID, stepName, TestItemType.STEP));
+            UUID stepUUID = orangebeardClient.startTestItem(testCaseId, new StartTestItem(testRunUUID, stepName, TestItemType.TEST));
             stepMap.put(stepName, stepUUID);
 
             if (testStep.getStep().getArgument() instanceof DataTableArgument) {
