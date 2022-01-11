@@ -1,16 +1,5 @@
 package io.orangebeard.listener;
 
-import io.cucumber.plugin.EventListener;
-import io.cucumber.plugin.event.DataTableArgument;
-import io.cucumber.plugin.event.EventPublisher;
-import io.cucumber.plugin.event.PickleStepTestStep;
-import io.cucumber.plugin.event.Result;
-import io.cucumber.plugin.event.TestCaseFinished;
-import io.cucumber.plugin.event.TestCaseStarted;
-import io.cucumber.plugin.event.TestRunFinished;
-import io.cucumber.plugin.event.TestRunStarted;
-import io.cucumber.plugin.event.TestStepFinished;
-import io.cucumber.plugin.event.TestStepStarted;
 import io.orangebeard.client.OrangebeardClient;
 import io.orangebeard.client.OrangebeardProperties;
 import io.orangebeard.client.OrangebeardV2Client;
@@ -29,6 +18,17 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import io.cucumber.plugin.EventListener;
+import io.cucumber.plugin.event.DataTableArgument;
+import io.cucumber.plugin.event.EventPublisher;
+import io.cucumber.plugin.event.PickleStepTestStep;
+import io.cucumber.plugin.event.Result;
+import io.cucumber.plugin.event.TestCaseFinished;
+import io.cucumber.plugin.event.TestCaseStarted;
+import io.cucumber.plugin.event.TestRunFinished;
+import io.cucumber.plugin.event.TestRunStarted;
+import io.cucumber.plugin.event.TestStepFinished;
+import io.cucumber.plugin.event.TestStepStarted;
 
 public class OrangebeardCucumberListener implements EventListener {
     private final OrangebeardClient orangebeardClient;
@@ -46,6 +46,11 @@ public class OrangebeardCucumberListener implements EventListener {
                 properties.getAccessToken(),
                 properties.getProjectName(),
                 properties.requiredValuesArePresent());
+    }
+
+    protected OrangebeardCucumberListener(OrangebeardProperties properties, OrangebeardClient orangebeardClient) {
+        this.properties = properties;
+        this.orangebeardClient = orangebeardClient;
     }
 
     @Override
@@ -68,7 +73,7 @@ public class OrangebeardCucumberListener implements EventListener {
         orangebeardClient.finishTestRun(testRunUUID, new FinishTestRun());
     }
 
-    private void startTestCase(TestCaseStarted event) {
+    protected void startTestCase(TestCaseStarted event) {
         UUID suiteId = startSuiteIfRequired(event.getTestCase().getUri());
         String name = getName(event.getTestCase().getKeyword(), event.getTestCase().getName());
         UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.STEP));
@@ -79,7 +84,7 @@ public class OrangebeardCucumberListener implements EventListener {
         orangebeardClient.finishTestItem(testItemMap.get(event.getTestCase().getName()), new FinishTestItem(testRunUUID, convertResult(event.getResult())));
     }
 
-    private void startTestStep(TestStepStarted event) {
+    protected void startTestStep(TestStepStarted event) {
         UUID testCaseId = testItemMap.get(event.getTestCase().getName());
 
         if (event.getTestStep() instanceof PickleStepTestStep) {
@@ -96,7 +101,7 @@ public class OrangebeardCucumberListener implements EventListener {
         }
     }
 
-    private void finishTestStep(TestStepFinished event) {
+    protected void finishTestStep(TestStepFinished event) {
         if (event.getTestStep() instanceof PickleStepTestStep) {
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
 
