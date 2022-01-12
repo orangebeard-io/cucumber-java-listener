@@ -1,7 +1,6 @@
 package io.orangebeard.listener;
 
 import io.orangebeard.client.OrangebeardClient;
-import io.orangebeard.client.OrangebeardProperties;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,9 +24,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrangebeardCucumberListenerTest {
-
-    @Mock
-    private OrangebeardProperties properties;
 
     @Mock
     private OrangebeardClient orangebeardClient;
@@ -72,6 +68,7 @@ public class OrangebeardCucumberListenerTest {
         TestStepStarted event = new TestStepStarted(Instant.now(), testCase, pickleStepTestStep);
         when(pickleStepTestStep.getStep()).thenReturn(step);
         when(step.getArgument()).thenReturn(dataTableArgument);
+
         orangebeardCucumberListener.startTestStep(event);
 
         verify(orangebeardClient).startTestItem(any(), any());
