@@ -39,7 +39,7 @@
         <dependency>
             <groupId>io.orangebeard</groupId>
             <artifactId>java-client</artifactId>
-            <version>1.1.18</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
