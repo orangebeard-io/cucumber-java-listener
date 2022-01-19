@@ -26,6 +26,7 @@
         <cucumber.version>7.0.0</cucumber.version>
         <mockito.version>4.2.0</mockito.version>
         <assertj.version>3.21.0</assertj.version>
+        <java-client.version>1.2.1</java-client.version>
     </properties>
 
     <scm>
@@ -39,7 +40,7 @@
         <dependency>
             <groupId>io.orangebeard</groupId>
             <artifactId>java-client</artifactId>
-            <version>1.1.18</version>
+            <version>${java-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
