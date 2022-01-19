@@ -76,7 +76,7 @@ public class OrangebeardCucumberListener implements EventListener {
     protected void startTestCase(TestCaseStarted event) {
         UUID suiteId = startSuiteIfRequired(event.getTestCase().getUri());
         String name = getName(event.getTestCase().getKeyword(), event.getTestCase().getName());
-        UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.STEP, true));
+        UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.TEST));
         testItemMap.put(event.getTestCase().getName(), testItemUUID);
     }
 
@@ -91,7 +91,7 @@ public class OrangebeardCucumberListener implements EventListener {
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
             String stepName = getName(testStep.getStep().getKeyword(), testStep.getStep().getText());
 
-            UUID stepUUID = orangebeardClient.startTestItem(testCaseId, new StartTestItem(testRunUUID, stepName, TestItemType.TEST, false));
+            UUID stepUUID = orangebeardClient.startTestItem(testCaseId, new StartTestItem(testRunUUID, stepName, TestItemType.STEP, false));
             stepMap.put(stepName, stepUUID);
 
             if (testStep.getStep().getArgument() instanceof DataTableArgument) {
@@ -125,7 +125,7 @@ public class OrangebeardCucumberListener implements EventListener {
         UUID suiteUUID = suiteMap.get(fileName);
 
         if (suiteUUID == null) {
-            suiteUUID = orangebeardClient.startTestItem(null, new StartTestItem(testRunUUID, fileName, TestItemType.SUITE, true));
+            suiteUUID = orangebeardClient.startTestItem(null, new StartTestItem(testRunUUID, fileName, TestItemType.SUITE));
         }
 
         suiteMap.put(fileName, suiteUUID);
