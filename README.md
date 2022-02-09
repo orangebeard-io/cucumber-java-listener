@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/orangebeard-io/cucumber-java-listener">
-    <img src="https://raw.githubusercontent.com/orangebeard-io/cucumber-java-listener/master/.github/logo.png" alt="Orangebeard.io Cucumber Java Listener" height="200">
+    <img src="https://raw.githubusercontent.com/orangebeard-io/cucumber-java-listener/master/.github/logo.svg" alt="Orangebeard.io Cucumber Java Listener" height="200">
   </a>
   <br>Orangebeard.io Cucumber Java Listener<br>
 </h1>
@@ -29,6 +29,9 @@
     <a href="#configuration">Configuration</a>
   </h4>
 </div>
+
+## Disclaimer
+This listener is provided as-is as a proof-of-concept. Some features may be untested as long as the version number is below 1.x.x.
 
 ## Installation
 
