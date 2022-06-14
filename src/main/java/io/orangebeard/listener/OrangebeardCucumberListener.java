@@ -1,11 +1,23 @@
 package io.orangebeard.listener;
 
+import io.cucumber.plugin.EventListener;
+import io.cucumber.plugin.event.DataTableArgument;
+import io.cucumber.plugin.event.EventPublisher;
+import io.cucumber.plugin.event.PickleStepTestStep;
+import io.cucumber.plugin.event.Result;
+import io.cucumber.plugin.event.TestCaseFinished;
+import io.cucumber.plugin.event.TestCaseStarted;
+import io.cucumber.plugin.event.TestRunFinished;
+import io.cucumber.plugin.event.TestRunStarted;
+import io.cucumber.plugin.event.TestStepFinished;
+import io.cucumber.plugin.event.TestStepStarted;
 import io.orangebeard.client.OrangebeardClient;
 import io.orangebeard.client.OrangebeardProperties;
 import io.orangebeard.client.OrangebeardV2Client;
 import io.orangebeard.client.entity.FinishTestItem;
 import io.orangebeard.client.entity.FinishTestRun;
 import io.orangebeard.client.entity.Log;
+import io.orangebeard.client.entity.LogFormat;
 import io.orangebeard.client.entity.LogLevel;
 import io.orangebeard.client.entity.StartTestItem;
 import io.orangebeard.client.entity.StartTestRun;
@@ -18,17 +30,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import io.cucumber.plugin.EventListener;
-import io.cucumber.plugin.event.DataTableArgument;
-import io.cucumber.plugin.event.EventPublisher;
-import io.cucumber.plugin.event.PickleStepTestStep;
-import io.cucumber.plugin.event.Result;
-import io.cucumber.plugin.event.TestCaseFinished;
-import io.cucumber.plugin.event.TestCaseStarted;
-import io.cucumber.plugin.event.TestRunFinished;
-import io.cucumber.plugin.event.TestRunStarted;
-import io.cucumber.plugin.event.TestStepFinished;
-import io.cucumber.plugin.event.TestStepStarted;
+
+import static io.orangebeard.listener.DataTableHelper.toMdTable;
 
 public class OrangebeardCucumberListener implements EventListener {
     private final OrangebeardClient orangebeardClient;
@@ -96,7 +99,7 @@ public class OrangebeardCucumberListener implements EventListener {
 
             if (testStep.getStep().getArgument() instanceof DataTableArgument) {
                 DataTableArgument datatable = (DataTableArgument) testStep.getStep().getArgument();
-                orangebeardClient.log(new Log(testRunUUID, stepUUID, LogLevel.info, datatable.cells().toString()));
+                orangebeardClient.log(new Log(testRunUUID, stepUUID, LogLevel.info, toMdTable(datatable.cells()), LogFormat.MARKDOWN));
             }
         }
     }
@@ -112,7 +115,7 @@ public class OrangebeardCucumberListener implements EventListener {
                 PrintWriter pw = new PrintWriter(sw);
                 event.getResult().getError().printStackTrace(pw);
 
-                orangebeardClient.log(new Log(testRunUUID, stepMap.get(stepName), LogLevel.error, sw.toString()));
+                orangebeardClient.log(new Log(testRunUUID, stepMap.get(stepName), LogLevel.error, sw.toString(), LogFormat.PLAIN_TEXT));
             }
             orangebeardClient.finishTestItem(stepMap.get(stepName), new FinishTestItem(testRunUUID, convertResult(event.getResult())));
         }

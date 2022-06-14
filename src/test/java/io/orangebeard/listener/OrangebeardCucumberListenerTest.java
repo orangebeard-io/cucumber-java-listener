@@ -1,21 +1,22 @@
 package io.orangebeard.listener;
 
-import io.orangebeard.client.OrangebeardClient;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Instant;
 import io.cucumber.plugin.event.DataTableArgument;
 import io.cucumber.plugin.event.PickleStepTestStep;
 import io.cucumber.plugin.event.Step;
 import io.cucumber.plugin.event.TestCase;
 import io.cucumber.plugin.event.TestCaseStarted;
 import io.cucumber.plugin.event.TestStepStarted;
+import io.orangebeard.client.OrangebeardClient;
+import io.orangebeard.client.entity.Log;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -72,9 +73,7 @@ public class OrangebeardCucumberListenerTest {
         orangebeardCucumberListener.startTestStep(event);
 
         verify(orangebeardClient).startTestItem(any(), any());
-        verify(orangebeardClient).log(any());
+        verify(orangebeardClient).log(any(Log.class));
     }
-
-
 }
 
