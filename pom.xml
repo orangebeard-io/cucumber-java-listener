@@ -4,7 +4,7 @@
 
     <groupId>io.orangebeard</groupId>
     <artifactId>cucumber-java-listener</artifactId>
-    <version>0.0.10-SNAPSHOT</version>
+    <version>0.0.11-SNAPSHOT</version>
 
     <url>https://github.com/orangebeard-io/cucumber-java-listener</url>
     <name>Orangebeard.io Cucumber Java Listener</name>
