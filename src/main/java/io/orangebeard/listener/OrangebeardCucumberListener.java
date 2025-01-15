@@ -11,30 +11,35 @@ import io.cucumber.plugin.event.TestRunFinished;
 import io.cucumber.plugin.event.TestRunStarted;
 import io.cucumber.plugin.event.TestStepFinished;
 import io.cucumber.plugin.event.TestStepStarted;
-import io.orangebeard.client.OrangebeardClient;
 import io.orangebeard.client.OrangebeardProperties;
-import io.orangebeard.client.OrangebeardV2Client;
-import io.orangebeard.client.entity.FinishTestItem;
-import io.orangebeard.client.entity.FinishTestRun;
-import io.orangebeard.client.entity.Log;
+import io.orangebeard.client.entity.FinishV3TestRun;
 import io.orangebeard.client.entity.LogFormat;
-import io.orangebeard.client.entity.LogLevel;
-import io.orangebeard.client.entity.StartTestItem;
-import io.orangebeard.client.entity.StartTestRun;
-import io.orangebeard.client.entity.Status;
-import io.orangebeard.client.entity.TestItemType;
+import io.orangebeard.client.entity.StartV3TestRun;
+import io.orangebeard.client.entity.log.Log;
+import io.orangebeard.client.entity.log.LogLevel;
+import io.orangebeard.client.entity.step.FinishStep;
+import io.orangebeard.client.entity.step.StartStep;
+import io.orangebeard.client.entity.suite.StartSuite;
+import io.orangebeard.client.entity.test.FinishTest;
+import io.orangebeard.client.entity.test.StartTest;
+import io.orangebeard.client.entity.test.TestStatus;
+import io.orangebeard.client.entity.test.TestType;
+import io.orangebeard.client.v3.OrangebeardAsyncV3Client;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static io.orangebeard.listener.DataTableHelper.toMdTable;
 
 public class OrangebeardCucumberListener implements EventListener {
-    private final OrangebeardClient orangebeardClient;
+    private final OrangebeardAsyncV3Client orangebeardClient;
     private final OrangebeardProperties properties;
     private UUID testRunUUID;
 
@@ -44,14 +49,10 @@ public class OrangebeardCucumberListener implements EventListener {
 
     public OrangebeardCucumberListener() {
         this.properties = new OrangebeardProperties();
-        this.orangebeardClient = new OrangebeardV2Client(
-                properties.getEndpoint(),
-                properties.getAccessToken(),
-                properties.getProjectName(),
-                properties.requiredValuesArePresent());
+        this.orangebeardClient = new OrangebeardAsyncV3Client();
     }
 
-    protected OrangebeardCucumberListener(OrangebeardProperties properties, OrangebeardClient orangebeardClient) {
+    protected OrangebeardCucumberListener(OrangebeardProperties properties, OrangebeardAsyncV3Client orangebeardClient) {
         this.properties = properties;
         this.orangebeardClient = orangebeardClient;
     }
@@ -69,43 +70,43 @@ public class OrangebeardCucumberListener implements EventListener {
     }
 
     private void startTestRun(TestRunStarted event) {
-        this.testRunUUID = orangebeardClient.startTestRun(new StartTestRun(properties.getTestSetName(), properties.getDescription(), properties.getAttributes()));
+        this.testRunUUID = orangebeardClient.startTestRun(new StartV3TestRun(properties.getTestSetName(), properties.getDescription(), properties.getAttributes()));
     }
 
     private void finishTestRun(TestRunFinished event) {
-        orangebeardClient.finishTestRun(testRunUUID, new FinishTestRun());
+        orangebeardClient.finishTestRun(testRunUUID, new FinishV3TestRun());
     }
 
     protected void startTestCase(TestCaseStarted event) {
         UUID suiteId = startSuiteIfRequired(event.getTestCase().getUri());
         String name = getName(event.getTestCase().getKeyword(), event.getTestCase().getName());
-        UUID testItemUUID = orangebeardClient.startTestItem(suiteId, new StartTestItem(testRunUUID, name, TestItemType.TEST));
-        testItemMap.put(event.getTestCase().getName(), testItemUUID);
+        UUID testUUID = orangebeardClient.startTest(new StartTest(this.testRunUUID, suiteId, name, TestType.TEST, null, Collections.emptySet(), ZonedDateTime.now()));
+        testItemMap.put(event.getTestCase().getName(), testUUID);
     }
 
     private void finishTestCase(TestCaseFinished event) {
-        orangebeardClient.finishTestItem(testItemMap.get(event.getTestCase().getName()), new FinishTestItem(testRunUUID, convertResult(event.getResult())));
+        orangebeardClient.finishTest(testItemMap.get(event.getTestCase().getName()), new FinishTest(testRunUUID, convertResult(event.getResult()), ZonedDateTime.now()));
     }
 
     protected void startTestStep(TestStepStarted event) {
-        UUID testCaseId = testItemMap.get(event.getTestCase().getName());
-
         if (event.getTestStep() instanceof PickleStepTestStep) {
+            UUID testCaseId = testItemMap.get(event.getTestCase().getName());
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
             String stepName = getName(testStep.getStep().getKeyword(), testStep.getStep().getText());
 
-            UUID stepUUID = orangebeardClient.startTestItem(testCaseId, new StartTestItem(testRunUUID, stepName, TestItemType.STEP, false));
+            UUID stepUUID = orangebeardClient.startStep(new StartStep(testRunUUID, testCaseId, null, stepName, null, ZonedDateTime.now()));
             stepMap.put(stepName, stepUUID);
 
             if (testStep.getStep().getArgument() instanceof DataTableArgument) {
                 DataTableArgument datatable = (DataTableArgument) testStep.getStep().getArgument();
-                orangebeardClient.log(new Log(testRunUUID, stepUUID, LogLevel.info, toMdTable(datatable.cells()), LogFormat.MARKDOWN));
+                orangebeardClient.log(new Log(testRunUUID, testCaseId, stepUUID, toMdTable(datatable.cells()), LogLevel.INFO, ZonedDateTime.now(), LogFormat.MARKDOWN));
             }
         }
     }
 
     protected void finishTestStep(TestStepFinished event) {
         if (event.getTestStep() instanceof PickleStepTestStep) {
+            UUID testCaseId = testItemMap.get(event.getTestCase().getName());
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
 
             String stepName = getName(testStep.getStep().getKeyword(), testStep.getStep().getText());
@@ -115,9 +116,9 @@ public class OrangebeardCucumberListener implements EventListener {
                 PrintWriter pw = new PrintWriter(sw);
                 event.getResult().getError().printStackTrace(pw);
 
-                orangebeardClient.log(new Log(testRunUUID, stepMap.get(stepName), LogLevel.error, sw.toString(), LogFormat.PLAIN_TEXT));
+                orangebeardClient.log(new Log(testRunUUID, testCaseId, stepMap.get(stepName), sw.toString(), LogLevel.INFO, ZonedDateTime.now(), LogFormat.MARKDOWN));
             }
-            orangebeardClient.finishTestItem(stepMap.get(stepName), new FinishTestItem(testRunUUID, convertResult(event.getResult())));
+            orangebeardClient.finishStep(stepMap.get(stepName), new FinishStep(testRunUUID, convertResult(event.getResult()), ZonedDateTime.now()));
         }
     }
 
@@ -128,7 +129,13 @@ public class OrangebeardCucumberListener implements EventListener {
         UUID suiteUUID = suiteMap.get(fileName);
 
         if (suiteUUID == null) {
-            suiteUUID = orangebeardClient.startTestItem(null, new StartTestItem(testRunUUID, fileName, TestItemType.SUITE));
+            suiteUUID = orangebeardClient.startSuite(new StartSuite(
+                    testRunUUID,
+                    null,
+                    null,
+                    Collections.emptySet(),
+                    List.of(fileName)
+            )).get(0);
         }
 
         suiteMap.put(fileName, suiteUUID);
@@ -140,19 +147,19 @@ public class OrangebeardCucumberListener implements EventListener {
         return keyword + ": " + name;
     }
 
-    private Status convertResult(Result result) {
+    private TestStatus convertResult(Result result) {
         switch (result.getStatus()) {
             case PASSED:
-                return Status.PASSED;
+                return TestStatus.PASSED;
             case SKIPPED:
             case PENDING:
             case UNUSED:
-                return Status.SKIPPED;
+                return TestStatus.SKIPPED;
             case UNDEFINED:
             case FAILED:
             case AMBIGUOUS:
-                return Status.FAILED;
+                return TestStatus.FAILED;
         }
-        return Status.FAILED;
+        return TestStatus.FAILED;
     }
 }

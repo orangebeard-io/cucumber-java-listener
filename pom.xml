@@ -4,7 +4,7 @@
 
     <groupId>io.orangebeard</groupId>
     <artifactId>cucumber-java-listener</artifactId>
-    <version>0.0.11-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <url>https://github.com/orangebeard-io/cucumber-java-listener</url>
     <name>Orangebeard.io Cucumber Java Listener</name>
@@ -13,22 +13,22 @@
 
     <developers>
         <developer>
-            <name>Maarten-Jan van Gool</name>
-            <email>maarten-jan@orangebeard.io</email>
+            <name>Tom Heintzberger</name>
+            <email>tom@orangebeard.io</email>
             <organizationUrl>https://orangebeard.io</organizationUrl>
         </developer>
     </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
-        <java.version>1.11</java.version>
-        <cucumber.version>7.2.3</cucumber.version>
-        <java-client.version>1.2.6</java-client.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <java.version>1.17</java.version>
+        <cucumber.version>7.20.1</cucumber.version>
+        <java-client.version>3.0.6</java-client.version>
 
         <!-- for test -->
-        <mockito.version>4.2.0</mockito.version>
-        <assertj.version>3.21.0</assertj.version>
+        <mockito.version>5.15.2</mockito.version>
+        <assertj.version>3.27.2</assertj.version>
     </properties>
 
     <scm>
