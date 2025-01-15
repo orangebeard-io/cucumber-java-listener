@@ -13,7 +13,7 @@
       alt="MVN Version" />
   </a>
   <a href="https://github.com/orangebeard-io/cucumber-java-listener/actions">
-    <img src="https://img.shields.io/github/workflow/status/orangebeard-io/cucumber-java-listener/release?style=flat-square"
+    <img src="https://img.shields.io/github/actions/workflow/status/orangebeard-io/cucumber-java-listener/release.yml?branch=main&style=flat-square"
       alt="Build Status" />
   </a>
   <a href="https://github.com/orangebeard-io/cucumber-java-listener/blob/master/LICENSE.txt">
@@ -29,9 +29,6 @@
     <a href="#configuration">Configuration</a>
   </h4>
 </div>
-
-## Disclaimer
-This listener is provided as-is as a proof-of-concept. Some features may be untested as long as the version number is below 1.x.x.
 
 ## Installation
 
@@ -68,6 +65,8 @@ orangebeard.testset=<TESTSET_NAME>
 orangebeard.description=<DESCRIPTION>
 orangebeard.attributes=key:value; value;
 ```
+For more configuration options, see: https://docs.orangebeard.io/connecting-test-tools/listener-api-clients/#auto-config
+
 
 ### Environment variables
 

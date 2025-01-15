@@ -6,8 +6,8 @@ import io.cucumber.plugin.event.Step;
 import io.cucumber.plugin.event.TestCase;
 import io.cucumber.plugin.event.TestCaseStarted;
 import io.cucumber.plugin.event.TestStepStarted;
-import io.orangebeard.client.OrangebeardClient;
-import io.orangebeard.client.entity.Log;
+import io.orangebeard.client.entity.log.Log;
+import io.orangebeard.client.v3.OrangebeardAsyncV3Client;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.when;
 public class OrangebeardCucumberListenerTest {
 
     @Mock
-    private OrangebeardClient orangebeardClient;
+    private OrangebeardAsyncV3Client orangebeardClient;
 
     @Mock
     private TestCase testCase;
@@ -45,13 +47,15 @@ public class OrangebeardCucumberListenerTest {
     private OrangebeardCucumberListener orangebeardCucumberListener;
 
     @Test
-    public void start_test_case_without_suite_calls_orangebeardClient_startTestItem_twice() throws URISyntaxException {
+    public void start_test_case_without_suite_calls_orangebeardClient_startSuite_and_startTest() throws URISyntaxException {
         TestCaseStarted event = new TestCaseStarted(Instant.now(), testCase);
         when(event.getTestCase().getUri()).thenReturn(new URI("this/is/the/uri"));
+        when(orangebeardClient.startSuite(any())).thenReturn(List.of(UUID.randomUUID()));
 
         orangebeardCucumberListener.startTestCase(event);
 
-        verify(orangebeardClient, times(2)).startTestItem(any(), any());
+        verify(orangebeardClient, times(1)).startSuite(any());
+        verify(orangebeardClient, times(1)).startTest(any());
     }
 
     @Test
@@ -61,7 +65,7 @@ public class OrangebeardCucumberListenerTest {
 
         orangebeardCucumberListener.startTestStep(event);
 
-        verify(orangebeardClient).startTestItem(any(), any());
+        verify(orangebeardClient).startStep(any());
     }
 
     @Test
@@ -72,7 +76,7 @@ public class OrangebeardCucumberListenerTest {
 
         orangebeardCucumberListener.startTestStep(event);
 
-        verify(orangebeardClient).startTestItem(any(), any());
+        verify(orangebeardClient).startStep(any());
         verify(orangebeardClient).log(any(Log.class));
     }
 }
